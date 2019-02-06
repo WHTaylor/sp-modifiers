@@ -1,6 +1,7 @@
 import csv
 import os.path
 from datetime import datetime
+from typing import List, Dict, Tuple
 
 
 def main():
@@ -17,7 +18,7 @@ def main():
         print('Facility: {}\nModifiers: {}'.format(input_file_name[:-4], modifiers_ordered_by_count))
 
 
-def read_modifiers(input_file_name, header_names):
+def read_modifiers(input_file_name: str, header_names: List[str]) -> List[Tuple[str, str]]:
     input_file_location = os.path.join(os.curdir, "csv", input_file_name)
     date_index = -1
     modifier_index = -1
@@ -28,18 +29,18 @@ def read_modifiers(input_file_name, header_names):
         first_row = True
         for row in reader:
             if first_row:
-                [date_index, modifier_index] = get_header_indexes(header_names, row)
+                (date_index, modifier_index) = get_header_indexes(header_names, row)
                 first_row = False
             else:
                 modifiers.append((row[date_index], row[modifier_index]))
     return modifiers
 
 
-def get_header_indexes(headers, row):
-    return [row.index(header) for header in headers]
+def get_header_indexes(headers: List[str], row: List[str]) -> Tuple[int, ...]:
+    return tuple(row.index(header) for header in headers)
 
 
-def count_proposals_modified_since(modifiers, date_threshold):
+def count_proposals_modified_since(modifiers: List[tuple], date_threshold: datetime) -> Dict[str, int]:
     modified_count = dict()
     for (date_string, modifier) in modifiers:
         date = datetime.strptime(date_string, "%d/%m/%Y %H:%M")
@@ -51,7 +52,7 @@ def count_proposals_modified_since(modifiers, date_threshold):
     return modified_count
 
 
-def order_by_int_value(d):
+def order_by_int_value(d: Dict[str, int]) -> List[Tuple[str, int]]:
     ordered = []
     while d.items():
         most = 0
