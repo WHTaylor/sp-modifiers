@@ -12,7 +12,7 @@ def main():
     for (input_file_name, headers) in inputs_with_headers.items():
         # Modifiers is a list of tuples of the form (Date modified, modified by)
         modifiers = read_modifiers(input_file_name, headers)
-        proposals_modified = count_proposals_modified(modifiers)
+        proposals_modified = count_proposals_modified_since(modifiers, datetime(2016, 1, 1))
         modifiers_ordered_by_count = order_by_int_value(proposals_modified)
         print('Facility: {}\nModifiers: {}'.format(input_file_name[:-4], modifiers_ordered_by_count))
 
@@ -39,11 +39,11 @@ def get_header_indexes(headers, row):
     return [row.index(header) for header in headers]
 
 
-def count_proposals_modified(modifiers):
+def count_proposals_modified_since(modifiers, date_threshold):
     modified_count = dict()
     for (date_string, modifier) in modifiers:
         date = datetime.strptime(date_string, "%d/%m/%Y %H:%M")
-        if date.year > 2016:
+        if date > date_threshold:
             if modifier in modified_count.keys():
                 modified_count[modifier] += 1
             else:
