@@ -5,10 +5,10 @@ from typing import List, Dict, Tuple
 
 
 def main():
-    # The artemis list does not contain 'modified' information, and has <200 entries (?)
     inputs_with_headers = {"isis.csv": ["Modified", "Modified By"],
                            "hpl.csv": ["Modified", "Modified By"],
-                           "lsf.csv": ["Modified", "Modified By"]}
+                           "lsf.csv": ["Modified", "Modified By"],
+                           "artemis.csv": ["Modified", "Modified By"]}
 
     for (input_file_name, headers) in inputs_with_headers.items():
         # Modifiers is a list of tuples of the form (Date modified, modified by)
