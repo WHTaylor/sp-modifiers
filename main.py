@@ -72,7 +72,7 @@ def translate_names(proposals_modified: Dict[str, int]) -> Dict[str, int]:
 def get_replacement_names():
     try:
         name_replacements = dict()
-        with open("replacement_names.csv", "r") as replacements_file:
+        with open(os.path.join(os.curdir, "data", "replacement_names.csv"), "r") as replacements_file:
             reader = csv.reader(replacements_file)
             for line in reader:
                 name_replacements[line[0]] = line[1]
