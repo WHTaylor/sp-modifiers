@@ -7,36 +7,46 @@ from requests_ntlm import HttpNtlmAuth
 
 def download_modified_data():
     headers = ["Modified", "ModifiedById"]
-    for list_name in get_all_list_names():
-        print(f'Requesting {list_name}')
-        response = get_xml_list_selected_fields(
-            f"http://www.facilities.rl.ac.uk/isis/programme/_vti_bin/ListData.svc/{list_name}",
-            headers)
-        print('Request complete')
-        parsed_response = parse(response)
-        write_to_file(parsed_response, list_name)
+    for (list_name, facility) in get_all_list_names():
+        list_done = False
+        parsed_entries = []
+        url = build_url(f"http://www.facilities.rl.ac.uk/{facility}/programme/_vti_bin/ListData.svc/{list_name}", headers)
+        while not list_done:
+            print(f'Requesting {url}')
+            response = get_xml_list_selected_fields(url)
+            parsed_response, next_page = parse(response)
+            parsed_entries.extend(parsed_response)
+            if next_page:
+                url = next_page
+            else:
+                list_done = True
+        write_to_file(parsed_entries, list_name)
 
 
 def get_all_list_names():
     list_names = []
     with open(os.path.join(os.curdir, "data", "isis_list_names.txt"), "r") as isis_file:
         for line in isis_file:
-            list_names.append(line.strip('\n'))
+            list_names.append((line.strip('\n'), "isis"))
 
     with open(os.path.join(os.curdir, "data", "clf_list_names.txt"), "r") as clf_file:
         for line in clf_file:
-            list_names.append(line.strip('\n'))
+            list_names.append((line.strip('\n'), "clf"))
 
     return list_names
 
 
-def get_xml_list_selected_fields(list_url, parameters):
-    url = list_url
+def build_url(base_url, parameters):
     if parameters:
-        url += "?$select=" + ",".join(parameters)
+        if "$skiptoken=" in base_url:
+            base_url += "&"
+
+        base_url += "?$select=" + ",".join(parameters)
+    return base_url
+
+
+def get_xml_list_selected_fields(url):
     response = request_session().get(url)
-    # print("Making another request")
-    # another_response = request_session().get("http://www.facilities.rl.ac.uk/clf/programme/_vti_bin/ListData.svc/Proposal_List_HPL")
     return response.text
 
 
@@ -53,6 +63,7 @@ def build_auth():
 
 
 def parse(xml_string):
+    next_page = None
     parsed_entries = []
     tree = xml.etree.ElementTree.fromstring(xml_string)
     for child in tree:
@@ -66,8 +77,11 @@ def parse(xml_string):
                                 s = properties.tag
                                 parsed_entry[s[s.index("}") + 1:]] = properties.text
             parsed_entries.append(parsed_entry)
+        elif child.tag.endswith("link"):
+            if child.attrib["rel"] == "next":
+                next_page = child.attrib["href"]
 
-    return parsed_entries
+    return parsed_entries, next_page
 
 
 def write_to_file(to_write, list_name):
