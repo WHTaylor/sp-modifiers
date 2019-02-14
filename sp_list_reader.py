@@ -91,16 +91,3 @@ def write_to_file(to_write, list_name):
 
 if __name__ == "__main__":
     download_modified_data()
-    # parsed_response = get_xml_list_selected_fields(f"http://www.facilities.rl.ac.uk/isis/programme/_vti_bin/ListData.svc/ProposalList",
-    #                                                ["Modified", "ModifiedById"])
-    # for entry in parsed_response:
-    #     print(type(entry), entry)
-    # exit()
-    # list_names = get_all_list_names()
-    # print(list_names)
-    # for list_name in ["ConsumableCases", "ConsumableInvoices", "ProposalList", "ExperimentTeam", "FAPInstruments", "ProposalInvestigators"]:#list_names:
-    #     parsed_response = get_xml_list_selected_fields(f"http://www.facilities.rl.ac.uk/isis/programme/_vti_bin/ListData.svc/{list_name}", ["Modified", "ModifiedById"])
-    #     counter = 0
-    #     for entry in parsed_response:
-    #         counter += 1
-    #     print(f'Received {counter} responses for {list_name}')
