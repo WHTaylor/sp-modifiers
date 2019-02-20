@@ -12,14 +12,14 @@ def main():
 
     for (input_file_name, headers) in inputs_with_headers.items():
         # Modifiers is a list of tuples of the form (Date modified, modified by)
-        modifiers = read_modifiers(input_file_name, headers)
+        modifiers = read_fields(input_file_name, headers)
         proposals_modified = count_proposals_modified_since(modifiers, datetime(2017, 1, 1))
         proposals_modified = translate_names(proposals_modified)
         modifiers_ordered_by_count = order_by_int_value(proposals_modified)
         print_formatted(input_file_name[:-4], modifiers_ordered_by_count)
 
 
-def read_modifiers(input_file_name: str, header_names: List[str]) -> List[Tuple[str, str]]:
+def read_fields(input_file_name: str, header_names: List[str]) -> List[Tuple[str, str]]:
     input_file_location = os.path.join(os.curdir, "csv", input_file_name)
     date_index = -1
     modifier_index = -1
